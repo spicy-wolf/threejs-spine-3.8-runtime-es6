@@ -1,9 +1,14 @@
 {
-  "dependencies": {
-    "@types/three": "^0.149.0",
-    "typescript": "^4.9.5"
-  },
+  "private": true,
+  "main": "./build/spine-threejs-es6.js",
+  "typings": "./build/spine-threejs-es6.d.ts",
   "scripts": {
     "build": "tsc -w -p tsconfig.json"
+  },
+  "dependencies": {
+    "@types/three": "^0.149.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
   }
 }
