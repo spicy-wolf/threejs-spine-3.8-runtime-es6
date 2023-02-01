@@ -1,4 +1,9 @@
 {
+  "name": "threejs-spine-3.8-runtime-es6",
+  "description": "A threejs-spine 3.8 runtime lib which is built in es6",
+  "version": "1.0.0",
+  "author": "Esoteric Software",
+  "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "main": "./build/spine-threejs-es6.js",
   "typings": "./build/spine-threejs-es6.d.ts",
@@ -10,5 +15,22 @@
   },
   "devDependencies": {
     "typescript": "^4.9.5"
-  }
+  },
+  "keywords": [
+    "gamedev",
+    "animations",
+    "2d",
+    "spine",
+    "game-dev",
+    "runtimes",
+    "skeletal"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spicy-wolf/threejs-spine-3.8-runtime-es6.git"
+  },
+  "bugs": {
+    "url": "https://github.com/spicy-wolf/threejs-spine-3.8-runtime-es6/issues"
+  },
+  "homepage": "https://github.com/spicy-wolf/threejs-spine-3.8-runtime-es6#readme"
 }
