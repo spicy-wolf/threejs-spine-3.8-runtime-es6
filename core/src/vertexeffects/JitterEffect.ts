@@ -27,25 +27,25 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine {
-	export class JitterEffect implements VertexEffect {
-		jitterX = 0;
-		jitterY = 0;
+import {Skeleton} from '../Skeleton';
+import {VertexEffect} from '../VertexEffect';
+import {Vector2, Color, MathUtils} from '../Utils';
 
-		constructor (jitterX: number, jitterY: number) {
-			this.jitterX = jitterX;
-			this.jitterY = jitterY;
-		}
+export class JitterEffect implements VertexEffect {
+    jitterX = 0;
+    jitterY = 0;
 
-		begin(skeleton: Skeleton): void {
-		}
+    constructor(jitterX: number, jitterY: number) {
+        this.jitterX = jitterX;
+        this.jitterY = jitterY;
+    }
 
-		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void {
-			position.x += MathUtils.randomTriangular(-this.jitterX, this.jitterY);
-			position.y += MathUtils.randomTriangular(-this.jitterX, this.jitterY);
-		}
+    begin(skeleton: Skeleton): void {}
 
-		end(): void {
-		}
-	}
+    transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void {
+        position.x += MathUtils.randomTriangular(-this.jitterX, this.jitterY);
+        position.y += MathUtils.randomTriangular(-this.jitterX, this.jitterY);
+    }
+
+    end(): void {}
 }

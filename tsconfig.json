@@ -1,21 +1,30 @@
 {
 	"compilerOptions": {
-		"module": "none",
+		"module": "CommonJS",
+		"target": "ES6",
+		"moduleResolution": "node",
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
-		"outFile": "build/spine-threejs-es6.js",
+		"outDir": "build/",
 		"sourceMap": true,
 		"declaration": true,
-		"target": "ES6",
 		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"@core": ["./core/src"],
+			"@core/*": ["./core/src/*"],
+			"@threejs": ["./threejs/src"],
+			"@threejs/*": ["./threejs/src/*"],
+		}
 	},
 	"include": [
+		"index.ts",
 		"core/src/**/*",
 		"threejs/src/**/*"
 	],
 	"exclude": [
 		"build/**/*",
 		"node_modules/**/*"
-	]
+	],
 }

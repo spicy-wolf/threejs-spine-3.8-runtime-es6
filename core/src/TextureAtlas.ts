@@ -27,194 +27,190 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine {
-	export class TextureAtlas implements Disposable {
-		pages = new Array<TextureAtlasPage>();
-		regions = new Array<TextureAtlasRegion>();
+import {Texture, TextureWrap, TextureFilter, TextureRegion} from './Texture';
+import type {Disposable} from './Utils';
 
-		constructor (atlasText: string, textureLoader: (path: string) => any) {
-			this.load(atlasText, textureLoader);
-		}
+export class TextureAtlas implements Disposable {
+    pages = new Array<TextureAtlasPage>();
+    regions = new Array<TextureAtlasRegion>();
 
-		private load (atlasText: string, textureLoader: (path: string) => any) {
-			if (textureLoader == null)
-				throw new Error("textureLoader cannot be null.");
+    constructor(atlasText: string, textureLoader: (path: string) => any) {
+        this.load(atlasText, textureLoader);
+    }
 
-			let reader = new TextureAtlasReader(atlasText);
-			let tuple = new Array<string>(4);
-			let page:TextureAtlasPage = null;
-			while (true) {
-				let line = reader.readLine();
-				if (line == null)
-					break;
-				line = line.trim();
-				if (line.length == 0)
-					page = null;
-				else if (!page) {
-					page = new TextureAtlasPage();
-					page.name = line;
+    private load(atlasText: string, textureLoader: (path: string) => any) {
+        if (textureLoader == null) throw new Error('textureLoader cannot be null.');
 
-					if (reader.readTuple(tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
-						page.width = parseInt(tuple[0]);
-						page.height = parseInt(tuple[1]);
-						reader.readTuple(tuple);
-					}
-					// page.format = Format[tuple[0]]; we don't need format in WebGL
+        let reader = new TextureAtlasReader(atlasText);
+        let tuple = new Array<string>(4);
+        let page: TextureAtlasPage = null;
+        while (true) {
+            let line = reader.readLine();
+            if (line == null) break;
+            line = line.trim();
+            if (line.length == 0) page = null;
+            else if (!page) {
+                page = new TextureAtlasPage();
+                page.name = line;
 
-					reader.readTuple(tuple);
-					page.minFilter = Texture.filterFromString(tuple[0]);
-					page.magFilter = Texture.filterFromString(tuple[1]);
+                if (reader.readTuple(tuple) == 2) {
+                    // size is only optional for an atlas packed with an old TexturePacker.
+                    page.width = parseInt(tuple[0]);
+                    page.height = parseInt(tuple[1]);
+                    reader.readTuple(tuple);
+                }
+                // page.format = Format[tuple[0]]; we don't need format in WebGL
 
-					let direction= reader.readValue();
-					page.uWrap = TextureWrap.ClampToEdge;
-					page.vWrap = TextureWrap.ClampToEdge;
-					if (direction == "x")
-						page.uWrap = TextureWrap.Repeat;
-					else if (direction == "y")
-						page.vWrap = TextureWrap.Repeat;
-					else if (direction == "xy")
-						page.uWrap = page.vWrap = TextureWrap.Repeat;
+                reader.readTuple(tuple);
+                page.minFilter = Texture.filterFromString(tuple[0]);
+                page.magFilter = Texture.filterFromString(tuple[1]);
 
-					page.texture = textureLoader(line);
-					page.texture.setFilters(page.minFilter, page.magFilter);
-					page.texture.setWraps(page.uWrap, page.vWrap);
-					page.width = page.texture.getImage().width;
-					page.height = page.texture.getImage().height;
-					this.pages.push(page);
-				} else {
-					let region:TextureAtlasRegion = new TextureAtlasRegion();
-					region.name = line;
-					region.page = page;
+                let direction = reader.readValue();
+                page.uWrap = TextureWrap.ClampToEdge;
+                page.vWrap = TextureWrap.ClampToEdge;
+                if (direction == 'x') page.uWrap = TextureWrap.Repeat;
+                else if (direction == 'y') page.vWrap = TextureWrap.Repeat;
+                else if (direction == 'xy') page.uWrap = page.vWrap = TextureWrap.Repeat;
 
-					let rotateValue = reader.readValue();
-					if (rotateValue.toLocaleLowerCase() == "true") {
-						region.degrees = 90;
-					} else if (rotateValue.toLocaleLowerCase() == "false") {
-						region.degrees = 0;
-					} else {
-						region.degrees = parseFloat(rotateValue);
-					}
-					region.rotate = region.degrees == 90;
+                page.texture = textureLoader(line);
+                page.texture.setFilters(page.minFilter, page.magFilter);
+                page.texture.setWraps(page.uWrap, page.vWrap);
+                page.width = page.texture.getImage().width;
+                page.height = page.texture.getImage().height;
+                this.pages.push(page);
+            } else {
+                let region: TextureAtlasRegion = new TextureAtlasRegion();
+                region.name = line;
+                region.page = page;
 
-					reader.readTuple(tuple);
-					let x = parseInt(tuple[0]);
-					let y = parseInt(tuple[1]);
+                let rotateValue = reader.readValue();
+                if (rotateValue.toLocaleLowerCase() == 'true') {
+                    region.degrees = 90;
+                } else if (rotateValue.toLocaleLowerCase() == 'false') {
+                    region.degrees = 0;
+                } else {
+                    region.degrees = parseFloat(rotateValue);
+                }
+                region.rotate = region.degrees == 90;
 
-					reader.readTuple(tuple);
-					let width = parseInt(tuple[0]);
-					let height = parseInt(tuple[1]);
+                reader.readTuple(tuple);
+                let x = parseInt(tuple[0]);
+                let y = parseInt(tuple[1]);
 
-					region.u = x / page.width;
-					region.v = y / page.height;
-					if (region.rotate) {
-						region.u2 = (x + height) / page.width;
-						region.v2 = (y + width) / page.height;
-					} else {
-						region.u2 = (x + width) / page.width;
-						region.v2 = (y + height) / page.height;
-					}
-					region.x = x;
-					region.y = y;
-					region.width = Math.abs(width);
-					region.height = Math.abs(height);
+                reader.readTuple(tuple);
+                let width = parseInt(tuple[0]);
+                let height = parseInt(tuple[1]);
 
-					if (reader.readTuple(tuple) == 4) { // split is optional
-						// region.splits = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
-						if (reader.readTuple(tuple) == 4) { // pad is optional, but only present with splits
-							//region.pads = Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
-							reader.readTuple(tuple);
-						}
-					}
+                region.u = x / page.width;
+                region.v = y / page.height;
+                if (region.rotate) {
+                    region.u2 = (x + height) / page.width;
+                    region.v2 = (y + width) / page.height;
+                } else {
+                    region.u2 = (x + width) / page.width;
+                    region.v2 = (y + height) / page.height;
+                }
+                region.x = x;
+                region.y = y;
+                region.width = Math.abs(width);
+                region.height = Math.abs(height);
 
-					region.originalWidth = parseInt(tuple[0]);
-					region.originalHeight = parseInt(tuple[1]);
+                if (reader.readTuple(tuple) == 4) {
+                    // split is optional
+                    // region.splits = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
+                    if (reader.readTuple(tuple) == 4) {
+                        // pad is optional, but only present with splits
+                        //region.pads = Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
+                        reader.readTuple(tuple);
+                    }
+                }
 
-					reader.readTuple(tuple);
-					region.offsetX = parseInt(tuple[0]);
-					region.offsetY = parseInt(tuple[1]);
+                region.originalWidth = parseInt(tuple[0]);
+                region.originalHeight = parseInt(tuple[1]);
 
-					region.index = parseInt(reader.readValue());
+                reader.readTuple(tuple);
+                region.offsetX = parseInt(tuple[0]);
+                region.offsetY = parseInt(tuple[1]);
 
-					region.texture = page.texture;
-					this.regions.push(region);
-				}
-			}
-		}
+                region.index = parseInt(reader.readValue());
 
-		findRegion (name: string): TextureAtlasRegion {
-			for (let i = 0; i < this.regions.length; i++) {
-				if (this.regions[i].name == name) {
-					return this.regions[i];
-				}
-			}
-			return null;
-		}
+                region.texture = page.texture;
+                this.regions.push(region);
+            }
+        }
+    }
 
-		dispose () {
-			for (let i = 0; i < this.pages.length; i++) {
-				this.pages[i].texture.dispose();
-			}
-		}
-	}
+    findRegion(name: string): TextureAtlasRegion {
+        for (let i = 0; i < this.regions.length; i++) {
+            if (this.regions[i].name == name) {
+                return this.regions[i];
+            }
+        }
+        return null;
+    }
 
-	class TextureAtlasReader {
-		lines: Array<string>;
-		index: number = 0;
+    dispose() {
+        for (let i = 0; i < this.pages.length; i++) {
+            this.pages[i].texture.dispose();
+        }
+    }
+}
 
-		constructor (text: string) {
-			this.lines = text.split(/\r\n|\r|\n/);
-		}
+class TextureAtlasReader {
+    lines: Array<string>;
+    index: number = 0;
 
-		readLine (): string {
-			if (this.index >= this.lines.length)
-				return null;
-			return this.lines[this.index++];
-		}
+    constructor(text: string) {
+        this.lines = text.split(/\r\n|\r|\n/);
+    }
 
-		readValue (): string {
-			let line = this.readLine();
-			let colon= line.indexOf(":");
-			if (colon == -1)
-				throw new Error("Invalid line: " + line);
-			return line.substring(colon + 1).trim();
-		}
+    readLine(): string {
+        if (this.index >= this.lines.length) return null;
+        return this.lines[this.index++];
+    }
 
-		readTuple (tuple: Array<string>): number {
-			let line = this.readLine();
-			let colon = line.indexOf(":");
-			if (colon == -1)
-				throw new Error("Invalid line: " + line);
-			let i = 0, lastMatch = colon + 1;
-			for (; i < 3; i++) {
-				let comma = line.indexOf(",", lastMatch);
-				if (comma == -1) break;
-				tuple[i] = line.substr(lastMatch, comma - lastMatch).trim();
-				lastMatch = comma + 1;
-			}
-			tuple[i] = line.substring(lastMatch).trim();
-			return i + 1;
-		}
-	}
+    readValue(): string {
+        let line = this.readLine();
+        let colon = line.indexOf(':');
+        if (colon == -1) throw new Error('Invalid line: ' + line);
+        return line.substring(colon + 1).trim();
+    }
 
-	export class TextureAtlasPage {
-		name: string;
-		minFilter: TextureFilter;
-		magFilter: TextureFilter;
-		uWrap: TextureWrap;
-		vWrap: TextureWrap;
-		texture: Texture;
-		width: number;
-		height: number;
-	}
+    readTuple(tuple: Array<string>): number {
+        let line = this.readLine();
+        let colon = line.indexOf(':');
+        if (colon == -1) throw new Error('Invalid line: ' + line);
+        let i = 0,
+            lastMatch = colon + 1;
+        for (; i < 3; i++) {
+            let comma = line.indexOf(',', lastMatch);
+            if (comma == -1) break;
+            tuple[i] = line.substr(lastMatch, comma - lastMatch).trim();
+            lastMatch = comma + 1;
+        }
+        tuple[i] = line.substring(lastMatch).trim();
+        return i + 1;
+    }
+}
 
-	export class TextureAtlasRegion extends TextureRegion {
-		page: TextureAtlasPage;
-		name: string;
-		x: number;
-		y: number;
-		index: number;
-		rotate: boolean;
-		degrees: number;
-		texture: Texture;
-	}
+export class TextureAtlasPage {
+    name: string;
+    minFilter: TextureFilter;
+    magFilter: TextureFilter;
+    uWrap: TextureWrap;
+    vWrap: TextureWrap;
+    texture: Texture;
+    width: number;
+    height: number;
+}
+
+export class TextureAtlasRegion extends TextureRegion {
+    page: TextureAtlasPage;
+    name: string;
+    x: number;
+    y: number;
+    index: number;
+    rotate: boolean;
+    degrees: number;
+    texture: Texture;
 }

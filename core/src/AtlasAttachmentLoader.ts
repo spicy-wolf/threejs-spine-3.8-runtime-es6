@@ -27,50 +27,58 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine {
-	/** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.
-	 *
-	 * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the
-	 * Spine Runtimes Guide. */
-	export class AtlasAttachmentLoader implements AttachmentLoader {
-		atlas: TextureAtlas;
+import {Skin} from './Skin';
+import {TextureAtlas} from './TextureAtlas';
+import {MeshAttachment} from './attachments/MeshAttachment';
+import {PathAttachment} from './attachments/PathAttachment';
+import {PointAttachment} from './attachments/PointAttachment';
+import {AttachmentLoader} from './attachments/AttachmentLoader';
+import {RegionAttachment} from './attachments/RegionAttachment';
+import {ClippingAttachment} from './attachments/ClippingAttachment';
+import {BoundingBoxAttachment} from './attachments/BoundingBoxAttachment';
 
-		constructor (atlas: TextureAtlas) {
-			this.atlas = atlas;
-		}
+/** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.
+ *
+ * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the
+ * Spine Runtimes Guide. */
+export class AtlasAttachmentLoader implements AttachmentLoader {
+    atlas: TextureAtlas;
 
-		newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
-			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-			region.renderObject = region;
-			let attachment = new RegionAttachment(name);
-			attachment.setRegion(region);
-			return attachment;
-		}
+    constructor(atlas: TextureAtlas) {
+        this.atlas = atlas;
+    }
 
-		newMeshAttachment (skin: Skin, name: string, path: string) : MeshAttachment {
-			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-			region.renderObject = region;
-			let attachment = new MeshAttachment(name);
-			attachment.region = region;
-			return attachment;
-		}
+    newRegionAttachment(skin: Skin, name: string, path: string): RegionAttachment {
+        let region = this.atlas.findRegion(path);
+        if (region == null) throw new Error('Region not found in atlas: ' + path + ' (region attachment: ' + name + ')');
+        region.renderObject = region;
+        let attachment = new RegionAttachment(name);
+        attachment.setRegion(region);
+        return attachment;
+    }
 
-		newBoundingBoxAttachment (skin: Skin, name: string) : BoundingBoxAttachment {
-			return new BoundingBoxAttachment(name);
-		}
+    newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment {
+        let region = this.atlas.findRegion(path);
+        if (region == null) throw new Error('Region not found in atlas: ' + path + ' (mesh attachment: ' + name + ')');
+        region.renderObject = region;
+        let attachment = new MeshAttachment(name);
+        attachment.region = region;
+        return attachment;
+    }
 
-		newPathAttachment (skin: Skin, name: string): PathAttachment {
-			return new PathAttachment(name);
-		}
+    newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment {
+        return new BoundingBoxAttachment(name);
+    }
 
-		newPointAttachment(skin: Skin, name: string): PointAttachment {
-			return new PointAttachment(name);
-		}
+    newPathAttachment(skin: Skin, name: string): PathAttachment {
+        return new PathAttachment(name);
+    }
 
-		newClippingAttachment(skin: Skin, name: string): ClippingAttachment {
-			return new ClippingAttachment(name);
-		}
-	}
+    newPointAttachment(skin: Skin, name: string): PointAttachment {
+        return new PointAttachment(name);
+    }
+
+    newClippingAttachment(skin: Skin, name: string): ClippingAttachment {
+        return new ClippingAttachment(name);
+    }
 }

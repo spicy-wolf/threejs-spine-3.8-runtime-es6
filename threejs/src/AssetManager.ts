@@ -27,12 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine.threejs {
-	export class AssetManager extends spine.AssetManager {
-		constructor (pathPrefix: string = "") {
-			super((image: HTMLImageElement) => {
-				return new ThreeJsTexture(image);
-			}, pathPrefix);
-		}
+import * as spine from '@core';
+import { ThreeJsTexture } from './ThreeJsTexture'
+
+export class AssetManager extends spine.AssetManager {
+	constructor(pathPrefix: string = "") {
+		super((image: HTMLImageElement) => {
+			return new ThreeJsTexture(image);
+		}, pathPrefix);
 	}
 }
