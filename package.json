@@ -5,8 +5,8 @@
   "author": "Esoteric Software",
   "license": "SEE LICENSE IN LICENSE",
   "private": true,
-  "main": "./build/spine-threejs-es6.js",
-  "typings": "./build/spine-threejs-es6.d.ts",
+  "main": "./build/index.js",
+  "typings": "./build/index.d.ts",
   "scripts": {
     "build": "tsc -w -p tsconfig.json"
   },
