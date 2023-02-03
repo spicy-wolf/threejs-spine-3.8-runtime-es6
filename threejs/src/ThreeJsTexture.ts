@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 import * as THREE from 'three'
-import { Texture, TextureFilter, TextureWrap } from '@core';
+import { Texture, TextureFilter, TextureWrap } from '../../core/src';
 
 export class ThreeJsTexture extends Texture {
 	texture: THREE.Texture;

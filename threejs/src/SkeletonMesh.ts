@@ -29,8 +29,8 @@
 
 import * as THREE from 'three';
 import { Vector2 } from 'three';
-import * as spine from '@core';
-import { AnimationState, AnimationStateData, ClippingAttachment, MeshAttachment, RegionAttachment, BlendMode, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, ArrayLike, Color, Utils, VertexEffect } from '@core';
+import * as spine from '../../core/src';
+import { AnimationState, AnimationStateData, ClippingAttachment, MeshAttachment, RegionAttachment, BlendMode, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, ArrayLike, Color, Utils, VertexEffect } from '../../core/src';
 import { MeshBatcher } from './MeshBatcher';
 import { ThreeJsTexture } from './ThreeJsTexture';
 

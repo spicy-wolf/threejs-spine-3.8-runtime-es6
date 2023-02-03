@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import * as spine from '@core';
+import * as spine from '../../core/src';
 import { ThreeJsTexture } from './ThreeJsTexture'
 
 export class AssetManager extends spine.AssetManager {

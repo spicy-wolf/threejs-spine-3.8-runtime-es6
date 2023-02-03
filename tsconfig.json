@@ -10,13 +10,7 @@
 		"sourceMap": true,
 		"declaration": true,
 		"skipLibCheck": true,
-		"baseUrl": ".",
-		"paths": {
-			"@core": ["./core/src"],
-			"@core/*": ["./core/src/*"],
-			"@threejs": ["./threejs/src"],
-			"@threejs/*": ["./threejs/src/*"],
-		}
+		"baseUrl": "."
 	},
 	"include": [
 		"index.ts",
