@@ -1,3 +1,8 @@
-import * as core from './core/src';
-import * as threejs from './threejs/src';
-export const threejsSpine = {...core, ...threejs};
+export * from './core/src';
+export { AssetManager } from './threejs/src';
+export { MeshBatcher } from './threejs/src';
+export {
+  SkeletonMeshMaterialParametersCustomizer,
+  SkeletonMeshMaterial,
+} from './threejs/src';
+export { ThreeJsTexture } from './threejs/src';
