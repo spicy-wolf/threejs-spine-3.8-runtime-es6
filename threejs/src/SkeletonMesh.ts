@@ -30,16 +30,14 @@
 import * as THREE from 'three';
 import { Vector2 } from 'three';
 import * as spine from '../../core/src';
-import { AnimationState, AnimationStateData, ClippingAttachment, MeshAttachment, RegionAttachment, BlendMode, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, ArrayLike, Color, Utils, VertexEffect } from '../../core/src';
+import { AnimationState, AnimationStateData, ClippingAttachment, MeshAttachment, RegionAttachment, BlendMode, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, ArrayLike, Color, Utils, VertexEffect, NumberArrayLike } from '../../core/src';
 import { MeshBatcher } from './MeshBatcher';
 import { ThreeJsTexture } from './ThreeJsTexture';
 
-export interface SkeletonMeshMaterialParametersCustomizer {
-	(materialParameters: THREE.ShaderMaterialParameters): void;
-}
+export type SkeletonMeshMaterialParametersCustomizer = (materialParameters: THREE.ShaderMaterialParameters) => void;
 
 export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
-	constructor(customizer: SkeletonMeshMaterialParametersCustomizer) {
+	constructor (customizer: SkeletonMeshMaterialParametersCustomizer) {
 		let vertexShader = `
 			attribute vec4 color;
 			varying vec2 vUv;
@@ -52,25 +50,36 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 		`;
 		let fragmentShader = `
 			uniform sampler2D map;
+			#ifdef USE_SPINE_ALPHATEST
+			uniform float alphaTest;
+			#endif
 			varying vec2 vUv;
 			varying vec4 vColor;
 			void main(void) {
 				gl_FragColor = texture2D(map, vUv)*vColor;
+				#ifdef USE_SPINE_ALPHATEST
+				if (gl_FragColor.a < alphaTest) discard;
+				#endif
 			}
 		`;
 
 		let parameters: THREE.ShaderMaterialParameters = {
 			uniforms: {
-				map: { value: null }
+				map: { value: null },
 			},
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
 			side: THREE.DoubleSide,
 			transparent: true,
 			depthWrite: false,
-			alphaTest: 0.5
+			alphaTest: 0.0
 		};
 		customizer(parameters);
+		if (parameters.alphaTest && parameters.alphaTest > 0) {
+			parameters.defines = { "USE_SPINE_ALPHATEST": 1 };
+			if (!parameters.uniforms) parameters.uniforms = {};
+			parameters.uniforms["alphaTest"] = { value: parameters.alphaTest };
+		}
 		super(parameters);
 	};
 }
@@ -83,7 +92,6 @@ export class SkeletonMesh extends THREE.Object3D {
 	skeleton: Skeleton;
 	state: AnimationState;
 	zOffset: number = 0.1;
-	vertexEffect: VertexEffect;
 
 	private batches = new Array<MeshBatcher>();
 	private nextBatchIndex = 0;
@@ -94,17 +102,16 @@ export class SkeletonMesh extends THREE.Object3D {
 
 	private vertices = Utils.newFloatArray(1024);
 	private tempColor = new Color();
-	private materialCustomizer: SkeletonMeshMaterialParametersCustomizer;
 
-	constructor(skeletonData: SkeletonData, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
+	constructor (skeletonData: SkeletonData, private materialCustomerizer: SkeletonMeshMaterialParametersCustomizer = (material) => { }) {
 		super();
-		this.materialCustomizer = materialCustomizer;
+
 		this.skeleton = new Skeleton(skeletonData);
 		let animData = new AnimationStateData(skeletonData);
 		this.state = new AnimationState(animData);
 	}
 
-	update(deltaTime: number) {
+	update (deltaTime: number) {
 		let state = this.state;
 		let skeleton = this.skeleton;
 
@@ -115,13 +122,13 @@ export class SkeletonMesh extends THREE.Object3D {
 		this.updateGeometry();
 	}
 
-	dispose() {
+	dispose () {
 		for (var i = 0; i < this.batches.length; i++) {
 			this.batches[i].dispose();
 		}
 	}
 
-	private clearBatches() {
+	private clearBatches () {
 		for (var i = 0; i < this.batches.length; i++) {
 			this.batches[i].clear();
 			this.batches[i].visible = false;
@@ -129,9 +136,9 @@ export class SkeletonMesh extends THREE.Object3D {
 		this.nextBatchIndex = 0;
 	}
 
-	private nextBatch() {
+	private nextBatch () {
 		if (this.batches.length == this.nextBatchIndex) {
-			let batch = new MeshBatcher(10920, this.materialCustomizer);
+			let batch = new MeshBatcher(10920, this.materialCustomerizer);
 			this.add(batch);
 			this.batches.push(batch);
 		}
@@ -140,24 +147,18 @@ export class SkeletonMesh extends THREE.Object3D {
 		return batch;
 	}
 
-	private updateGeometry() {
+	private updateGeometry () {
 		this.clearBatches();
 
 		let tempPos = this.tempPos;
 		let tempUv = this.tempUv;
 		let tempLight = this.tempLight;
 		let tempDark = this.tempDark;
-
-		var numVertices = 0;
-		var verticesLength = 0;
-		var indicesLength = 0;
-
-		let blendMode: BlendMode = null;
 		let clipper = this.clipper;
 
-		let vertices: ArrayLike<number> = this.vertices;
-		let triangles: Array<number> = null;
-		let uvs: ArrayLike<number> = null;
+		let vertices: NumberArrayLike = this.vertices;
+		let triangles: Array<number> | null = null;
+		let uvs: NumberArrayLike | null = null;
 		let drawOrder = this.skeleton.drawOrder;
 		let batch = this.nextBatch();
 		batch.begin();
@@ -166,10 +167,13 @@ export class SkeletonMesh extends THREE.Object3D {
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			let vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
 			let slot = drawOrder[i];
-			if (!slot.bone.active) continue;
+			if (!slot.bone.active) {
+				clipper.clipEndWithSlot(slot);
+				continue;
+			}
 			let attachment = slot.getAttachment();
-			let attachmentColor: Color = null;
-			let texture: ThreeJsTexture = null;
+			let attachmentColor: Color | null;
+			let texture: ThreeJsTexture | null;
 			let numFloats = 0;
 			if (attachment instanceof RegionAttachment) {
 				let region = <RegionAttachment>attachment;
@@ -179,24 +183,27 @@ export class SkeletonMesh extends THREE.Object3D {
 				region.computeWorldVertices(slot.bone, vertices, 0, vertexSize);
 				triangles = SkeletonMesh.QUAD_TRIANGLES;
 				uvs = region.uvs;
-				texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
+				texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region!.renderObject).page.texture;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
 				attachmentColor = mesh.color;
 				vertices = this.vertices;
 				numFloats = (mesh.worldVerticesLength >> 1) * vertexSize;
 				if (numFloats > vertices.length) {
-					vertices = this.vertices = spine.Utils.newFloatArray(numFloats);
+					vertices = this.vertices = Utils.newFloatArray(numFloats);
 				}
 				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, vertexSize);
 				triangles = mesh.triangles;
 				uvs = mesh.uvs;
-				texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
+				texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region!.renderObject).page.texture;
 			} else if (attachment instanceof ClippingAttachment) {
 				let clip = <ClippingAttachment>(attachment);
 				clipper.clipStart(slot, clip);
 				continue;
-			} else continue;
+			} else {
+				clipper.clipEndWithSlot(slot);
+				continue;
+			}
 
 			if (texture != null) {
 				let skeleton = slot.bone.skeleton;
@@ -209,70 +216,28 @@ export class SkeletonMesh extends THREE.Object3D {
 					skeletonColor.b * slotColor.b * attachmentColor.b,
 					alpha);
 
-				let finalVertices: ArrayLike<number>;
+				let finalVertices: NumberArrayLike;
 				let finalVerticesLength: number;
-				let finalIndices: ArrayLike<number>;
+				let finalIndices: NumberArrayLike;
 				let finalIndicesLength: number;
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
+					clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, tempLight, false);
 					let clippedVertices = clipper.clippedVertices;
 					let clippedTriangles = clipper.clippedTriangles;
-					if (this.vertexEffect != null) {
-						let vertexEffect = this.vertexEffect;
-						let verts = clippedVertices;
-						for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
-							tempPos.x = verts[v];
-							tempPos.y = verts[v + 1];
-							tempLight.setFromColor(color);
-							tempDark.set(0, 0, 0, 0);
-							tempUv.x = verts[v + 6];
-							tempUv.y = verts[v + 7];
-							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-							verts[v] = tempPos.x;
-							verts[v + 1] = tempPos.y;
-							verts[v + 2] = tempLight.r;
-							verts[v + 3] = tempLight.g;
-							verts[v + 4] = tempLight.b;
-							verts[v + 5] = tempLight.a;
-							verts[v + 6] = tempUv.x;
-							verts[v + 7] = tempUv.y;
-						}
-					}
 					finalVertices = clippedVertices;
 					finalVerticesLength = clippedVertices.length;
 					finalIndices = clippedTriangles;
 					finalIndicesLength = clippedTriangles.length;
 				} else {
 					let verts = vertices;
-					if (this.vertexEffect != null) {
-						let vertexEffect = this.vertexEffect;
-						for (let v = 0, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
-							tempPos.x = verts[v];
-							tempPos.y = verts[v + 1];
-							tempLight.setFromColor(color);
-							tempDark.set(0, 0, 0, 0);
-							tempUv.x = uvs[u];
-							tempUv.y = uvs[u + 1];
-							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-							verts[v] = tempPos.x;
-							verts[v + 1] = tempPos.y;
-							verts[v + 2] = tempLight.r;
-							verts[v + 3] = tempLight.g;
-							verts[v + 4] = tempLight.b;
-							verts[v + 5] = tempLight.a;
-							verts[v + 6] = tempUv.x;
-							verts[v + 7] = tempUv.y;
-						}
-					} else {
-						for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
-							verts[v] = color.r;
-							verts[v + 1] = color.g;
-							verts[v + 2] = color.b;
-							verts[v + 3] = color.a;
-							verts[v + 4] = uvs[u];
-							verts[v + 5] = uvs[u + 1];
-						}
+					for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
+						verts[v] = color.r;
+						verts[v + 1] = color.g;
+						verts[v + 2] = color.b;
+						verts[v + 3] = color.a;
+						verts[v + 4] = uvs[u];
+						verts[v + 5] = uvs[u + 1];
 					}
 					finalVertices = vertices;
 					finalVerticesLength = numFloats;
@@ -280,36 +245,23 @@ export class SkeletonMesh extends THREE.Object3D {
 					finalIndicesLength = triangles.length;
 				}
 
-				if (finalVerticesLength == 0 || finalIndicesLength == 0)
+				if (finalVerticesLength == 0 || finalIndicesLength == 0) {
+					clipper.clipEndWithSlot(slot);
 					continue;
+				}
 
 				// Start new batch if this one can't hold vertices/indices
-				if (!batch.canBatch(finalVerticesLength, finalIndicesLength)) {
+				if (!batch.canBatch(finalVerticesLength / SkeletonMesh.VERTEX_SIZE, finalIndicesLength)) {
 					batch.end();
 					batch = this.nextBatch();
 					batch.begin();
 				}
 
-				// FIXME per slot blending would require multiple material support
-				//let slotBlendMode = slot.data.blendMode;
-				//if (slotBlendMode != blendMode) {
-				//	blendMode = slotBlendMode;
-				//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
-				//}
+				const slotBlendMode = slot.data.blendMode;
+				const slotTexture = texture.texture;
+				const materialGroup = batch.findMaterialGroup(slotTexture, slotBlendMode);
 
-				let batchMaterial = <SkeletonMeshMaterial>batch.material;
-				if (batchMaterial.uniforms.map.value == null) {
-					batchMaterial.uniforms.map.value = texture.texture;
-				}
-				if (batchMaterial.uniforms.map.value != texture.texture) {
-					batch.end();
-					batch = this.nextBatch();
-					batch.begin();
-					batchMaterial = <SkeletonMeshMaterial>batch.material;
-					batchMaterial.uniforms.map.value = texture.texture;
-				}
-				batchMaterial.needsUpdate = true;
-
+				batch.addMaterialGroup(finalIndicesLength, materialGroup);
 				batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z);
 				z += zOffset;
 			}

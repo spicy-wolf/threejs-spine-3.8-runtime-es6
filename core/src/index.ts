@@ -90,7 +90,7 @@ export {TextureAtlas, TextureAtlasPage, TextureAtlasRegion} from './TextureAtlas
 export {TransformConstraint} from './TransformConstraint';
 export {TransformConstraintData} from './TransformConstraintData';
 export {Triangulator} from './Triangulator';
-export {Color, DebugUtils, IntSet, Interpolation, MathUtils, Pool, Pow, PowOut, TimeKeeper, Utils, Vector2, WindowedMean, fround} from './Utils';
+export * from './Utils';
 
 export type {AttachmentLoader} from './attachments/AttachmentLoader';
 export type {Timeline} from './Animation';

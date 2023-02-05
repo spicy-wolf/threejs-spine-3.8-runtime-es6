@@ -56,6 +56,11 @@ export class IntSet {
     }
 }
 
+export interface NumberArrayLike {
+	readonly length: number;
+	[n: number]: number;
+}
+
 export interface Disposable {
     dispose(): void;
 }
