@@ -3,6 +3,7 @@ A threejs-spine 3.8 runtime lib which is built in es6
 ## Why?
 * The latest threejs uses ES6 and the libs in https://github.com/EsotericSoftware/spine-runtimes/tree/3.8/spine-ts/build are not compatible.
 * Offical recommendation is to upgrade all dependencies/projects to 4.X.X. however, some legacy projects are still using 3.8. \*sign\*
+* Also support bleding color, e.g. addictive
 
 ## Licensing
 
