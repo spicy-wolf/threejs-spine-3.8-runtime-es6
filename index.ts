@@ -4,5 +4,6 @@ export { MeshBatcher } from './threejs/src';
 export {
   SkeletonMeshMaterialParametersCustomizer,
   SkeletonMeshMaterial,
+  SkeletonMesh
 } from './threejs/src';
 export { ThreeJsTexture } from './threejs/src';

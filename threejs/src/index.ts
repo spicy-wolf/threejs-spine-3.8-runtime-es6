@@ -29,5 +29,5 @@
 
 export { AssetManager } from './AssetManager';
 export { MeshBatcher } from './MeshBatcher';
-export { SkeletonMeshMaterialParametersCustomizer, SkeletonMeshMaterial } from './SkeletonMesh';
+export { SkeletonMeshMaterialParametersCustomizer, SkeletonMeshMaterial, SkeletonMesh } from './SkeletonMesh';
 export { ThreeJsTexture } from './ThreeJsTexture';
