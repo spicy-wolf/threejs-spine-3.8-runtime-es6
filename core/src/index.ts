@@ -27,20 +27,20 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-export {Attachment, VertexAttachment} from './attachments/Attachment';
-export {AttachmentType} from './attachments/AttachmentType';
-export {BoundingBoxAttachment} from './attachments/BoundingBoxAttachment';
-export {ClippingAttachment} from './attachments/ClippingAttachment';
-export {MeshAttachment} from './attachments/MeshAttachment';
-export {PathAttachment} from './attachments/PathAttachment';
-export {PointAttachment} from './attachments/PointAttachment';
-export {RegionAttachment} from './attachments/RegionAttachment';
-export {AssetManager as SpineAssetManager} from './threejs/AssetManager';
-export {MeshBatcher} from './threejs/MeshBatcher';
-export {SkeletonMesh, SkeletonMeshMaterial} from './threejs/SkeletonMesh';
-export {ThreeJsTexture} from './threejs/ThreeJsTexture';
-export {JitterEffect} from './vertexeffects/JitterEffect';
-export {SwirlEffect} from './vertexeffects/SwirlEffect';
+export { Attachment, VertexAttachment } from './attachments/Attachment';
+export { AttachmentType } from './attachments/AttachmentType';
+export { BoundingBoxAttachment } from './attachments/BoundingBoxAttachment';
+export { ClippingAttachment } from './attachments/ClippingAttachment';
+export { MeshAttachment } from './attachments/MeshAttachment';
+export { PathAttachment } from './attachments/PathAttachment';
+export { PointAttachment } from './attachments/PointAttachment';
+export { RegionAttachment } from './attachments/RegionAttachment';
+export { AssetManager as SpineAssetManager } from './threejs/AssetManager';
+export { MeshBatcher } from './threejs/MeshBatcher';
+export { SkeletonMesh, SkeletonMeshMaterial } from './threejs/SkeletonMesh';
+export { ThreeJsTexture } from './threejs/ThreeJsTexture';
+export { JitterEffect } from './vertexeffects/JitterEffect';
+export { SwirlEffect } from './vertexeffects/SwirlEffect';
 export {
     MixBlend,
     Animation,
@@ -63,38 +63,39 @@ export {
     PathConstraintSpacingTimeline,
     PathConstraintPositionTimeline,
 } from './Animation';
-export {AnimationState, AnimationStateAdapter, EventQueue, EventType, TrackEntry} from './AnimationState';
-export {AnimationStateData} from './AnimationStateData';
-export {AssetManager} from './AssetManager';
-export {AtlasAttachmentLoader} from './AtlasAttachmentLoader';
-export {BlendMode} from './BlendMode';
-export {BoneData, TransformMode} from './BoneData';
-export {ConstraintData} from './ConstraintData';
-export {Event} from './Event';
-export {EventData} from './EventData';
-export {IkConstraint} from './IkConstraint';
-export {IkConstraintData} from './IkConstraintData';
-export {PathConstraint} from './PathConstraint';
-export {SharedAssetManager} from './SharedAssetManager';
-export {Skeleton} from './Skeleton';
-export {SkeletonBinary} from './SkeletonBinary';
-export {SkeletonBounds} from './SkeletonBounds';
-export {SkeletonClipping} from './SkeletonClipping';
-export {SkeletonData} from './SkeletonData';
-export {SkeletonJson} from './SkeletonJson';
-export {Skin, SkinEntry} from './Skin';
-export {Slot} from './Slot';
-export {SlotData} from './SlotData';
-export {Texture, TextureWrap, FakeTexture, TextureFilter, TextureRegion} from './Texture';
-export {TextureAtlas, TextureAtlasPage, TextureAtlasRegion} from './TextureAtlas';
-export {TransformConstraint} from './TransformConstraint';
-export {TransformConstraintData} from './TransformConstraintData';
-export {Triangulator} from './Triangulator';
+export { AnimationState, AnimationStateAdapter, EventQueue, EventType, TrackEntry } from './AnimationState';
+export { AnimationStateData } from './AnimationStateData';
+export { AssetManager } from './AssetManager';
+export { AtlasAttachmentLoader } from './AtlasAttachmentLoader';
+export { BlendMode } from './BlendMode';
+export { Bone } from './Bone';
+export { BoneData, TransformMode } from './BoneData';
+export { ConstraintData } from './ConstraintData';
+export { Event } from './Event';
+export { EventData } from './EventData';
+export { IkConstraint } from './IkConstraint';
+export { IkConstraintData } from './IkConstraintData';
+export { PathConstraint } from './PathConstraint';
+export { SharedAssetManager } from './SharedAssetManager';
+export { Skeleton } from './Skeleton';
+export { SkeletonBinary } from './SkeletonBinary';
+export { SkeletonBounds } from './SkeletonBounds';
+export { SkeletonClipping } from './SkeletonClipping';
+export { SkeletonData } from './SkeletonData';
+export { SkeletonJson } from './SkeletonJson';
+export { Skin, SkinEntry } from './Skin';
+export { Slot } from './Slot';
+export { SlotData } from './SlotData';
+export { Texture, TextureWrap, FakeTexture, TextureFilter, TextureRegion } from './Texture';
+export { TextureAtlas, TextureAtlasPage, TextureAtlasRegion } from './TextureAtlas';
+export { TransformConstraint } from './TransformConstraint';
+export { TransformConstraintData } from './TransformConstraintData';
+export { Triangulator } from './Triangulator';
 export * from './Utils';
 
-export type {AttachmentLoader} from './attachments/AttachmentLoader';
-export type {Timeline} from './Animation';
-export type {AnimationStateListener} from './AnimationState';
-export type {Updatable} from './Updatable';
-export type {ArrayLike, Map, Disposable, Restorable} from './Utils';
-export type {VertexEffect} from './VertexEffect';
+export type { AttachmentLoader } from './attachments/AttachmentLoader';
+export type { Timeline } from './Animation';
+export type { AnimationStateListener } from './AnimationState';
+export type { Updatable } from './Updatable';
+export type { ArrayLike, Map, Disposable, Restorable } from './Utils';
+export type { VertexEffect } from './VertexEffect';
