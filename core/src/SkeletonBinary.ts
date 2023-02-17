@@ -27,21 +27,21 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import {Skin} from './Skin';
-import {Event} from './Event';
-import {SlotData} from './SlotData';
-import {BlendMode} from './BlendMode';
-import {EventData} from './EventData';
-import {SkeletonData} from './SkeletonData';
-import {Color, Utils} from './Utils';
-import {AttachmentType} from './attachments/AttachmentType';
-import {MeshAttachment} from './attachments/MeshAttachment';
-import {AttachmentLoader} from './attachments/AttachmentLoader';
-import {IkConstraintData} from './IkConstraintData';
-import {TransformMode, BoneData} from './BoneData';
-import {TransformConstraintData} from './TransformConstraintData';
-import {VertexAttachment, Attachment} from './attachments/Attachment';
-import {PositionMode, SpacingMode, RotateMode, PathConstraintData} from './PathConstraintData';
+import { Skin } from './Skin';
+import { Event } from './Event';
+import { SlotData } from './SlotData';
+import { BlendMode } from './BlendMode';
+import { EventData } from './EventData';
+import { SkeletonData } from './SkeletonData';
+import { Color, Utils } from './Utils';
+import { AttachmentType } from './attachments/AttachmentType';
+import { MeshAttachment } from './attachments/MeshAttachment';
+import { AttachmentLoader } from './attachments/AttachmentLoader';
+import { IkConstraintData } from './IkConstraintData';
+import { TransformMode, BoneData } from './BoneData';
+import { TransformConstraintData } from './TransformConstraintData';
+import { VertexAttachment, Attachment } from './attachments/Attachment';
+import { PositionMode, SpacingMode, RotateMode, PathConstraintData } from './PathConstraintData';
 import {
     Timeline,
     Animation,
@@ -130,7 +130,7 @@ export class SkeletonBinary {
 
         skeletonData.hash = input.readString();
         skeletonData.version = input.readString();
-        // if ('3.8.75' == skeletonData.version) throw new Error('Unsupported skeleton data, please export with a newer version of Spine.');
+        if ('3.8.75' == skeletonData.version) throw new Error('Unsupported skeleton data, please export with a newer version of Spine.');
         skeletonData.x = input.readFloat();
         skeletonData.y = input.readFloat();
         skeletonData.width = input.readFloat();
@@ -839,7 +839,7 @@ export class SkeletonBinary {
 }
 
 class BinaryInput {
-    constructor(data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) {}
+    constructor(data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) { }
 
     readByte(): number {
         return this.buffer.getInt8(this.index++);
@@ -895,7 +895,7 @@ class BinaryInput {
         byteCount--;
         let chars = '';
         let charCount = 0;
-        for (let i = 0; i < byteCount; ) {
+        for (let i = 0; i < byteCount;) {
             let b = this.readByte();
             switch (b >> 4) {
                 case 12:
@@ -943,5 +943,5 @@ class LinkedMesh {
 }
 
 class Vertices {
-    constructor(public bones: Array<number> = null, public vertices: Array<number> | Float32Array = null) {}
+    constructor(public bones: Array<number> = null, public vertices: Array<number> | Float32Array = null) { }
 }
