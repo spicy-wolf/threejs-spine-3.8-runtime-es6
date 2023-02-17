@@ -27,19 +27,19 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import {Skin} from './Skin';
-import {Event} from './Event';
-import {SlotData} from './SlotData';
-import {BlendMode} from './BlendMode';
-import {EventData} from './EventData';
-import {ArrayLike, Color, Utils} from './Utils';
-import {SkeletonData} from './SkeletonData';
-import {MeshAttachment} from './attachments/MeshAttachment';
-import {IkConstraintData} from './IkConstraintData';
-import {BoneData, TransformMode} from './BoneData';
-import {TransformConstraintData} from './TransformConstraintData';
-import {VertexAttachment, Attachment} from './attachments/Attachment';
-import {PathConstraintData, PositionMode, SpacingMode, RotateMode} from './PathConstraintData';
+import { Skin } from './Skin';
+import { Event } from './Event';
+import { SlotData } from './SlotData';
+import { BlendMode } from './BlendMode';
+import { EventData } from './EventData';
+import { ArrayLike, Color, Utils } from './Utils';
+import { SkeletonData } from './SkeletonData';
+import { MeshAttachment } from './attachments/MeshAttachment';
+import { IkConstraintData } from './IkConstraintData';
+import { BoneData, TransformMode } from './BoneData';
+import { TransformConstraintData } from './TransformConstraintData';
+import { VertexAttachment, Attachment } from './attachments/Attachment';
+import { PathConstraintData, PositionMode, SpacingMode, RotateMode } from './PathConstraintData';
 import {
     Timeline,
     ColorTimeline,
@@ -60,7 +60,7 @@ import {
     PathConstraintPositionTimeline,
     Animation,
 } from './Animation';
-import type {AttachmentLoader} from './attachments/AttachmentLoader';
+import type { AttachmentLoader } from './attachments/AttachmentLoader';
 
 /** Loads skeleton data in the Spine JSON format.
  *
@@ -91,7 +91,7 @@ export class SkeletonJson {
         if (skeletonMap != null) {
             skeletonData.hash = skeletonMap.hash;
             skeletonData.version = skeletonMap.spine;
-            // if ('3.8.75' == skeletonData.version) throw new Error('Unsupported skeleton data, please export with a newer version of Spine.');
+            if ('3.8.75' == skeletonData.version) throw new Error('Unsupported skeleton data, please export with a newer version of Spine.');
             skeletonData.x = skeletonMap.x;
             skeletonData.y = skeletonMap.y;
             skeletonData.width = skeletonMap.width;
@@ -475,7 +475,7 @@ export class SkeletonJson {
         }
         let weights = new Array<number>();
         let bones = new Array<number>();
-        for (let i = 0, n = vertices.length; i < n; ) {
+        for (let i = 0, n = vertices.length; i < n;) {
             let boneCount = vertices[i++];
             bones.push(boneCount);
             for (let nn = i + boneCount * 4; i < nn; i += 4) {
